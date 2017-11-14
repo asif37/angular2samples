@@ -1,0 +1,487 @@
+﻿<div class="col-md-12">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h4><span class="text-semibold">{{ 'PAGE_ACCOUNT_TITLE' | translate }}</span></h4>
+                <a class="heading-elements-toggle"><i class="icon-more"></i></a>
+            </div>
+        </div>
+
+        <div class="breadcrumb-line breadcrumb-line-component">
+            <a class="breadcrumb-elements-toggle"><i class="icon-menu-open"></i></a>
+            <ul class="breadcrumb">
+                <li><a [routerLink]="'/home'"><i class="icon-home2 position-left"></i> {{ 'PAGE_DASHBOARD_TITLE' | translate }}</a></li>
+                <li class="active"><a>{{ 'PAGE_ACCOUNT_TITLE' | translate }}</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div id="mainContent" class="col-md-12">
+    <div class="content">
+        <div class="panel panel-flat">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <p-dataTable [filterDelay]="500" [totalRecords]="totalAccounts" [value]="ExtensionManagementList" [loading]="loading" [rowsPerPageOptions]="[5,10,20,30,40,50,100]" [responsive]="true" rows="10" [paginator]="true" #dt>
+                            <p-column field="id" header="{{ 'PAGE_ACCOUNT_ACCOUNTNUMBER' | translate }}" [filter]="true" [sortable]="true" filterPlaceholder="Search"></p-column>
+                            <p-column field="extension_id" header="{{ 'PAGE_ACCOUNT_EXTENSIONNUMBER' | translate }}" [filter]="true" [sortable]="true" filterPlaceholder="Search"></p-column>
+                            <p-column field="sip_status" [filter]="true" [sortable]="true" filterPlaceholder="{{ 'PAGE_ACCOUNT_SEARCH' | translate }}" header="Staus">
+                                <ng-template let-col let-car="rowData" pTemplate="body">
+                                    <i *ngIf="car[col.field]==0" class="icon-circle2" style="color:#999999"></i>
+                                    <i *ngIf="car[col.field]==1" class="icon-circle2" style="color:#4CAF50"></i>
+                                </ng-template>
+                            </p-column>
+                            <p-column field="email" [sortable]="true" header="{{ 'PAGE_ACCOUNT_EMAIL' | translate }}" styleClass="hidden-xs" [filter]="true" filterPlaceholder="Search"></p-column>
+                            <p-column *ngIf="configuration.checkPermission('Account.Edit')" field="" header="Edit">
+                                <ng-template let-account="rowData" pTemplate="body">
+                                    <!--<div style="color:#fff" class="btn-group pull-right" [hidden]="!showButtons">-->
+                                    <a href="#" (click)="editAccountModal(account)" class="btn btn-icon btn-success"><i style="color:#fff" class="icon-pencil6"></i></a>
+                                    <!-- </div>-->
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="btn-group pull-right">
+                        <a [routerLink]="'/home'" class="btn  btn-danger">{{ 'BUTTON_BACK_CAPTION' | translate }}</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div id="addAccount" style="display:none">
+    <div class="col-md-12 col-xs-12">
+        <div class="content">
+            <div class="panel panel-flat">
+                <div class="panel-body">
+                    <div class="hidden-xs col-md-2">
+                        <nav class="navbar navbar-inverse">
+
+                            <div>
+                                <div class="collapse navbar-collapse" id="myNavbar">
+                                    <ul class="nav navbar-nav">
+                                        <li class="active"><a href="#section1">Account Info</a></li>
+                                        <li><a href="#section2">Subscriber Info</a></li>
+                                        <li><a href="#section3">Extension Details</a></li>
+                                        <li><a href="#section4">Music On Hold</a></li>
+                                        <li><a href="#section5">Caller Id</a></li>
+                                        <li><a href="#section7">Voicemail Settings</a></li>
+                                        <li><a href="#section6">Manage Forwarding</a></li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </nav>
+                    </div>
+                    <div class="col-md-10 col-xs-12">
+                        <div class="modal-body scrollspy-example">
+                            <div id="section1" class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h4>{{'PAGE_ACCOUNT_MODEL_ACCOUNT_INFO' | translate}}</h4>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label>{{ 'PAGE_ACCOUNT_ACCOUNTNUMBER' | translate }}</label>
+                                            <input name="id" id="id" type="text" readonly [(ngModel)]="editAccountModel.id" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5" *ngIf="showPassword">
+                                        <div class="form-group">
+                                            <label>{{ 'PAGE_ACCOUNT_SIPPASSWORD' | translate }}</label>
+                                            <div class="input-group">
+                                                <span (click)="showPasswordMethod()" class="input-group-addon">
+                                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                                </span>
+                                                <input [disabled]="disablePaswUpdate" name="h323_password" id="h323_password" type="password" [(ngModel)]="editAccountModel.h323_password" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label>{{ 'PAGE_ACCOUNT_BLOCK' | translate }}</label>
+                                            <div class="form-group">
+                                                <p-inputSwitch (onChange)="handleChange($event)" onLabel="Yes" offLabel="No" name="blocked" id="blocked" [styleClass]="form-control" [(ngModel)]="editSwitch"></p-inputSwitch>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="section2" class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h4>{{ 'PAGE_ACCOUNT_SUBSCRIBER_INFO' | translate }}</h4>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-md-4">
+                                        <label>{{ 'PAGE_ACCOUNT_FIRSTNAME' | translate }}</label>
+                                        <input name="firstname" id="firstname" [(ngModel)]="editAccountModel.firstname" type="text" class="form-control" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>{{ 'PAGE_ACCOUNT_LASTNAME' | translate }}</label>
+                                            <input name="lastname" id="lastname" [(ngModel)]="editAccountModel.lastname" type="text" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>{{ 'PAGE_ACCOUNT_EMAIL' | translate }}</label>
+                                            <input name="email" id="email" [(ngModel)]="editAccountModel.email" type="email" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="section3" class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h4>{{ 'PAGE_ACCOUNT_EXTENSION_DETAILS' | translate }}</h4>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>{{ 'PAGE_ACCOUNT_EXTENSIONNAME' | translate }}</label>
+                                            <input name="extension_name" id="extension_name" type="text" [(ngModel)]="editAccountModel.extension_name" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>{{ 'PAGE_ACCOUNT_EXTENSIONNUMBER' | translate }} <i *ngIf="configSettings.ExtNumberLength != 0">Length {{configSettings.ExtNumberLength}}</i></label>
+                                            <input name="extension_id" id="extension_id" type="text" [(ngModel)]="editAccountModel.extension_id" placeholder="{{configSettings.MinimumRange}}-{{configSettings.MaximumRange}} " class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="section4" class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h4>{{ 'PAGE_ACCOUNT_MUSICONHOLD' | translate }}</h4>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>{{ 'PAGE_ACCOUNT_ENABLEMOH' | translate }}</label>
+                                            <div>
+
+                                                <p-inputSwitch [(ngModel)]="mohEnabled" onLabel="Yes" offLabel="No" name="MOH" [styleClass]="form-control"></p-inputSwitch>
+                                            </div>
+                                            <!--<input name="login" id="login" type="text" [(ngModel)]="editAccountModel.login" class="form-control">-->
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4" [hidden]="!mohEnabled">
+                                        <div class="form-group">
+                                            <label>{{'PAGE_ACCOUNT_SELECTMOH' | translate}}</label>
+                                            <select name="selectedMoh" class="form-control" [(ngModel)]="selectedMoh">
+
+                                                <option *ngFor="let x of mohDropDownList" [ngValue]="x.value">{{x.label}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="section5" class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h4>{{'PAGE_ACCOUNT_CALLERID' | translate}}</h4>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <!--<div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Hide CLI {{hideCli}}</label>
+                                            <div>
+                                                <p-inputSwitch [(ngModel)]="hideCli" onLabel="Yes" offLabel="No" name="CLI"></p-inputSwitch>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>{{'PAGE_ACCOUNT_CHOOSECLI' | translate}}</label>
+                                            <select name="clis" (change)="cliChangeEvent(this)" class="form-control" [(ngModel)]="selectedCli">
+
+                                                <option *ngFor="let x of cliDropDownList" [ngValue]="x.value">{{x.label}}</option>
+                                            </select>
+                                            <!--<div>
+                                                <p-dropdown [options]="cliDropDownList" name="clis"  [(ngModel)]="selectedCli" [style]="{'width':'150px'}"></p-dropdown>
+                                            </div>-->
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4" [hidden]="!showOtherCli">
+                                        <div class="form-group">
+                                            <label>{{'PAGE_ACCOUNT_NUMBER' | translate}}</label>
+                                            <input name="Other_Cli" id="Other_cli" type="text" [(ngModel)]="otherCliNumber" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="section7" class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h4>Voicemail Settings</h4>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>VM Enable</label>
+                                        <div>
+                                            <p-inputSwitch onLabel="Yes" offLabel="No" name="blocked" id="blocked" [styleClass]="form-control" [(ngModel)]="voiceMailViewType.VMFlag"></p-inputSwitch>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Type</label>
+                                        <div class="">
+                                            <select class="form-control" name="order" [(ngModel)]="voiceMailViewType.VMMode">
+                                                <option value="Y">Fax</option>
+                                                <option value="N">Voicemail</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Email</label>
+                                        <div class="">
+                                            <input name="timeOut" type="text" class="form-control" [(ngModel)]="voiceMailViewModel.ext_email">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="section6" class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h4>{{'PAGE_ACCOUNT_MANAGEFORWARDING' | translate}}</h4>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>{{'PAGE_ACCOUNT_ORDER' | translate}}</label>
+                                            <select class="form-control" name="order" [(ngModel)]="followmeInfo.sequence">
+                                                <option value="Order">{{'PAGE_ACCOUNT_ASLISTED' | translate}}</option>
+                                                <option value="Random">{{'PAGE_ACCOUNT_RANDOM' | translate}}</option>
+                                                <option value="Simultaneous">{{'PAGE_ACCOUNT_SIMULTANEOUS' | translate}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>{{'PAGE_ACCOUNT_DEFAULTTIMEOUT' | translate}}</label>
+                                            <div class="input-group">
+                                                <input name="timeOut" type="text" [(ngModel)]="followmeInfo.timeout" class="form-control">
+                                                <span class="input-group-addon">
+                                                    {{'PAGE_ACCOUNT_SECONDS' | translate}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-2 pull-right">
+                                        <a class="btn pull-right  btn-primary" (click)="addForwardingNumberEvent()"><i class="icon-plus2"></i>&nbsp;{{'BUTTON_UPDATE_ADDFORWARDING' | translate}} </a>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <p-dataTable [value]="followmeNumberList" [loading]="forwardingGridLoader" [rowsPerPageOptions]="[5,10,20,30,40,50,100]" [responsive]="true" rows="10" [paginator]="true">
+                                            <p-column field="name" header="{{'PAGE_ACCOUNT_NAME' | translate}}"></p-column>
+                                            <p-column field="destination" header="{{'PAGE_ACCOUNT_DESTINATION' | translate}}"></p-column>
+                                            <p-column styleClass="hidden-xs" field="period" header="{{'PAGE_ACCOUNT_PERIOD' | translate}}"></p-column>
+                                            <p-column styleClass="hidden-xs" field="timeout" header="{{'PAGE_ACCOUNT_TIMEOUT' | translate}}"></p-column>
+                                            <p-column field="isActive" header="Active">
+                                                <ng-template let-col let-forward="rowData" pTemplate="body">
+                                                    <div>
+                                                        <p-inputSwitch [(ngModel)]="forward.isActive" onLabel="Yes" offLabel="No" name="MOH" [styleClass]="form-control"></p-inputSwitch>
+                                                    </div>
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column header="">
+                                                <ng-template let-col let-forward="rowData" pTemplate="body">
+                                                    <div style="color:#fff" class="btn-group pull-right">
+                                                        <a href="#" (click)="editForwardingNumber(forward)" class="btn btn-icon btn-success"><i style="color:#fff" class="icon-pencil6"></i></a>
+                                                        <a href="#" (click)="deleteForwardingNumber(forward)" class="btn btn-icon btn-danger"><i style="color:#fff" class="icon-trash-alt"></i></a>
+                                                    </div>
+                                                </ng-template>
+                                            </p-column>
+
+                                        </p-dataTable>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button (click)="submitAccount()" type="button" class="btn btn-primary "><i id="updateButtonLoader" class="hidden fa fa-refresh fa-spin fa-fw"></i>&nbsp;{{ 'BUTTON_UPDATE_CAPTION' | translate }}</button>
+                        <button (click)="closeEditModel()" type="button" class="btn btn-default " data-dismiss="modal">{{ 'BUTTON_CLOSE_CAPTION' | translate }}</button>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="addForwardingNumber" class="modal fade in">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" (click)="closeAddForwardingNumberModel()">×</button>
+                <h5 class="modal-title">{{'PAGE_ACCOUNT_MANAGEFORWARDING' | translate}}</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>{{'PAGE_ACCOUNT_NAME' | translate}}</label>
+                            <select name="forwardAccount" id="selectFrowardingOption" (change)="forwardChangeEvent($event)" class="form-control" [(ngModel)]="forwardAddModel.selectedForwardAccoutIAccount">
+                                <optgroup label="Accounts">
+                                    <option *ngFor="let x of forwardingAccountList" [ngValue]="x.id">{{x.extension_name}}</option>
+                                </optgroup>
+                                <optgroup label="Hunt Groups">
+                                    <option *ngFor="let y of AccountListModel.HuntGroupList" [ngValue]="y.id">{{y.name}}</option>
+                                </optgroup>
+                                <optgroup label="Others">
+                                    <option [ngValue]="'-1'">Mobile</option>
+                                    <option [ngValue]="'-2'">Sip Uri</option>
+                                    <option [ngValue]="'-3'">Land Line</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>{{'PAGE_ACCOUNT_DESTINATION' | translate}}</label>
+                            <input type="text" [(ngModel)]="forwardAddModel.selectedForwardAccountId" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col-md-4" *ngIf="showDomain">
+                        <div class="form-group">
+                            <label>{{'PAGE_ACCOUNT_DOMAIN' | translate}}</label>
+                            <input type="text" [(ngModel)]="forwardAddModel.domain" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>{{'PAGE_ACCOUNT_TIMEOUT' | translate}}</label>
+                        <div class="input-group">
+                            <input name="timeOut" type="text" [(ngModel)]="forwardAddModel.timeout" class="form-control">
+                            <span class="input-group-addon">
+                                Seconds
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 pull-right">
+                        <div class="form-group">
+                            <label>{{'PAGE_ACCOUNT_ACTIVE' | translate}}</label>
+                            <div>
+                                <p-inputSwitch onLabel="Yes" offLabel="No" name="blocked" id="blocked" [styleClass]="form-control" [(ngModel)]="forwardAddModel.isActive"></p-inputSwitch>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>{{'PAGE_ACCOUNT_FROMTIME' | translate}}</label>
+                            <div class='input-group date' id='fromTime'>
+                                <input id="fromTimeVal" type='text' class="form-control" [(ngModel)]="forwardAddModel.fromTime" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>{{'PAGE_ACCOUNT_TOTIME' | translate}}</label>
+                            <div class='input-group date' id='toTime'>
+                                <input id="toTimeVal" type='text' class="form-control" [(ngModel)]="forwardAddModel.toTime" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <!--<div class="c
+                    ol
+                    <div class="row">
+
+                        <!--<div class="col-md-3">
+                            <div class="form-group">
+                                <label>Time: {{forwardAddModel.rangeValues[0] + ' - ' + forwardAddModel.rangeValues[1]}}</label>
+                                <p-slider (onChange)="timeRange($event)" [(ngModel)]="forwardAddModel.rangeValues" styleClass="form-control" [style]="{'width':'200px'}" [min]="0" [max]="24" [range]="true"></p-slider>
+                            </div>
+                        </div>-->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>{{'PAGE_ACCOUNT_DATES' | translate}}</label>
+                            <div>
+                                <!--<p-listbox  [listStyle]="{'max-height':'100px'}" [options]="dates" [(ngModel)]="forwardAddModel.selectedDates" multiple="multiple" checkbox="checkbox" filter="filter">
+                                </p-listbox>-->
+                                <p-multiSelect [options]="dates" [(ngModel)]="forwardAddModel.selectedDates"></p-multiSelect>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>{{'PAGE_ACCOUNT_DAYS' | translate}}</label>
+                            <div>
+                                <p-multiSelect [styleClass]="form-control" [options]="weekDays" [(ngModel)]="forwardAddModel.selectedDays"></p-multiSelect>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>{{'PAGE_ACCOUNT_MONTHS' | translate}}</label>
+                            <div>
+                                <p-multiSelect [styleClass]="form-control" [options]="months" [(ngModel)]="forwardAddModel.selectedMonths"></p-multiSelect>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="btn-group pull-right">
+                        <a (click)="addCondition()" class="btn  btn-primary">{{'BUTTON_ADDCONDITION_CAPTIONS' | translate}}</a>
+                        <a *ngIf="addToExistingRuleHidden" (click)="addToExistingCondition()" class="btn  btn-primary">{{'BUTTON_ADDEXISTINGCONDITION_CAPTIONS' | translate}}</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>{{'PAGE_ACCOUNT_CONDITIONRULES' | translate}}</label>
+                            <div>
+                                <textarea pInputTextarea [rows]="2" [cols]="130" disabled autoResize="autoResize" [(ngModel)]="forwardAddModel.period_description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="btn-group pull-right">
+                        <a (click)="closeAddForwardingNumberModel()" class="btn  btn-danger">{{"BUTTON_CLOSE_CAPTION" | translate}}</a>
+                        <a (click)="updateForwardingNumberDetails()" class="btn  btn-primary">{{"BUTTON_SAVE_CAPTION" | translate}}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
